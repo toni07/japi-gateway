@@ -1,5 +1,7 @@
 package com.cyranis.japi;
 
+import com.cyranis.japi.dao.WebServiceDAO;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -54,17 +56,25 @@ public class Launcher {
 		get("*", (request, res) ->
 		{
 			System.out.println("in GET method");
-			final String requestMethod = request.requestMethod();// The HTTP method (GET, ..etc)
 			final String uri = request.uri();// the uri, e.g. "/foo/toto"
 			final String[] urlSplit = uri.split("/");
 			if("admin".equals(urlSplit[1])){
 				System.out.println("Admin URL, skipping...");
 			}
 			else{
-				final Map<String, String> cookies = request.cookies();// request cookies sent by the client
-				final Set<String> headers = request.headers();// the HTTP header list
-				final String header1 = request.headers("User-Agent");// value of BAR header
-				final Map<String, String> params = request.params();// map with all parameters
+				final WebServiceDAO webServiceDAO = new WebServiceDAO();
+				final Map<String, Object> webService = webServiceDAO.getByUri(uri);
+				if(null != webService){
+					System.out.println("found corresponding WS!");
+					final String requestMethod = request.requestMethod();// The HTTP method (GET, ..etc)
+					final Map<String, String> cookies = request.cookies();// request cookies sent by the client
+					final Set<String> headers = request.headers();// the HTTP header list
+					final String header1 = request.headers("User-Agent");// value of BAR header
+					final Map<String, String> params = request.params();// map with all parameters
+				}
+				else{
+					System.err.println("no corresponding WS found for `url_from` " + uri);
+				}
 			}
 
 			return "API Management";

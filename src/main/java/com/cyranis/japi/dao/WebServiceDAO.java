@@ -1,11 +1,12 @@
 package com.cyranis.japi.dao;
 
-import org.sql2o.Sql2o;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author aepardeau on 23/06/2017.
  */
-public class WebServiceDAO {
+public class WebServiceDAO extends AbstractDAO{
 
 	/**
 	 * **************************************************************************************
@@ -24,9 +25,13 @@ public class WebServiceDAO {
 	 * methods
 	 * **************************************************************************************
 	 */
-	public static void doSth()
+	public Map<String, Object> getByUri(String uri)
 	{
-		final Sql2o sql2o = new Sql2o("jdbc:h2:~/database", "sa", "");
+		final StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * FROM webservices WHERE url_from = :url_from");
+		final Map<String, Object> parametersMap = new HashMap<>(2);
+		parametersMap.put("url_from", uri);
+		return getUniqueResult(sql, parametersMap);
 	}
 
 	/**

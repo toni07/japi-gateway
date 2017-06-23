@@ -53,6 +53,20 @@ public class AbstractDAO {
 		}
 	}
 
+	/**
+	 * Gets the <b>first</b> result of a SELECT query using the Sql2O library
+	 * @param sql
+	 * @param parameterMap
+	 * @return
+	 */
+	public Map<String, Object> getUniqueResult(StringBuilder sql, Map<String, Object> parameterMap) {
+
+		final List<Map<String, Object>> resultList = getListResult(sql, parameterMap);
+		if (null != resultList && !resultList.isEmpty()) {
+			return resultList.get(0);
+		}
+		return null;
+	}
 
 	/**
 	 * Executes an INSERT query using the Sql2O library

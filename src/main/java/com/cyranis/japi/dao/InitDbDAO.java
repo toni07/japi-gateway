@@ -1,7 +1,5 @@
 package com.cyranis.japi.dao;
 
-import org.sql2o.Sql2o;
-
 /**
  * @author aepardeau on 23/06/2017.
  */
@@ -25,16 +23,16 @@ public class InitDbDAO extends AbstractDAO{
 	 * **************************************************************************************
 	 */
 	public static void main(String[] args) {
-		new InitDbDAO().doSth();
+		new InitDbDAO().doInit();
 	}
 
-	public void doSth()
+	public void doInit()
 	{
-		final StringBuilder sql = new StringBuilder("CREATE TABLE table1 ( user varchar(50) )");
+		final StringBuilder sql = new StringBuilder("CREATE TABLE webservices (id_ws IDENTITY, label VARCHAR(255), url_from VARCHAR(255), url_to VARCHAR(255), cache_time_in_ms INT)");
 		executeUpdate(sql, null);
 
 		sql.setLength(0);
-		sql.append("INSERT INTO table1 ( user ) VALUES ( 'Claudio' )");
+		sql.append("INSERT INTO webservices (label, url_from, url_to, cache_time_in_ms) VALUES ( 'Test WebService', '/ws1', 'http://localhost:19080/test-ws', 0)");
 		executeUpdate(sql, null);
 	}
 
