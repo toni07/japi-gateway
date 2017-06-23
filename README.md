@@ -1,13 +1,13 @@
 # japi-gateway
 A simple API Gateway written in Java. Add APIs, monitor the access, manage cache times, etc...
 
-### Database
+## Database
 The database that stores the WebServices is an embedded H2.
 When grabbing the project from scratch, be sure to launch the `main()` method from InitDbDAO (it initializes the database).
 The database is composed of a main table, `webservices`, whose structure is:
----------------------------------------------------------------------
+---------------------------------------------------------------------------------
 |   id_ws   |   label   |   url_from  |     url_to    |     cache_time_in_ms    |
----------------------------------------------------------------------
+---------------------------------------------------------------------------------
 
 + `label`: The name of the web service. Whatever you want.
 + `url_from`: is the URL that arrives in this application, for instance: https://myapi.mysite.com/api1/what?id=1 then put `/api1/what` in this field
