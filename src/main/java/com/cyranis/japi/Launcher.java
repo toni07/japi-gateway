@@ -31,6 +31,9 @@ public class Launcher {
 
 		port(Integer.valueOf(args[0]));
 
+		/**
+		 *
+		 */
 		path("/admin", () -> {
 			before("/*", (q, a) -> System.out.println("in Admin GET method"));
 			path("/email", () -> {
@@ -45,16 +48,26 @@ public class Launcher {
 			});
 		});
 
+		/**
+		 *
+		 */
 		get("*", (request, res) ->
 		{
 			System.out.println("in GET method");
 			final String requestMethod = request.requestMethod();// The HTTP method (GET, ..etc)
 			final String uri = request.uri();// the uri, e.g. "/foo/toto"
-			final Map<String, String> cookies = request.cookies();// request cookies sent by the client
-			final Set<String> headers = request.headers();// the HTTP header list
-			final String header1 = request.headers("User-Agent");// value of BAR header
-			final Map<String, String> params = request.params();// map with all parameters
-			return "Hello World";
+			final String[] urlSplit = uri.split("/");
+			if("admin".equals(urlSplit[1])){
+				System.out.println("Admin URL, skipping...");
+			}
+			else{
+				final Map<String, String> cookies = request.cookies();// request cookies sent by the client
+				final Set<String> headers = request.headers();// the HTTP header list
+				final String header1 = request.headers("User-Agent");// value of BAR header
+				final Map<String, String> params = request.params();// map with all parameters
+			}
+
+			return "API Management";
 		});
 
 	}
