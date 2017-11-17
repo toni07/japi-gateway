@@ -14,6 +14,7 @@
 
     <h3>Liste des WS</h3>
     <a target="_blank" href="add-edit.htm">+ Add</a>
+    &nbsp;&nbsp;<a target="_blank" href="add-edit-upload.htm">+ Add & Upload</a>
     &nbsp;&nbsp;<a target="_blank" href="/admin/ws/list?export=1">Export</a>
     <table style="width:100%;" border="1">
         <thead>
@@ -22,6 +23,7 @@
                 <th>url from</th>
                 <th>url to</th>
                 <th>cache time (ms)</th>
+                <th>actions</th>
             </tr>
         </thead>
         <tbody id="list-objects">
@@ -36,7 +38,7 @@
     </form>
     -->
     <script>
-       function ajaxRequest(url, callback)
+       function ajaxRequest(url, method, callback)
        {
           var xhttp = new XMLHttpRequest();
           xhttp.onreadystatechange = function() {
@@ -44,8 +46,18 @@
                 callback(this.responseText);
             }
           };
-          xhttp.open("GET", url, true);
+          xhttp.open(method, url, true);
           xhttp.send();
+       }
+
+       function deleteObj(id)
+       {
+            if(confirm('Delete this webservice?')){
+                ajaxRequest('admin/ws/?id_ws=' + id, 'DELETE', function(jsonData){
+                    alert('ok');
+                    refreshList();
+                });
+            };
        }
 
        function dateUSToFR(theDate)
@@ -62,11 +74,13 @@
             return document.getElementById(id);
         }
 
-       document.addEventListener("DOMContentLoaded", function() {
-          ajaxRequest('/admin/ws/list', function(jsonData){
+        function refreshList()
+        {
+            ajaxRequest('admin/ws/list', 'GET', function(jsonData){
                 jsonData = JSON.parse(jsonData);
                 console.log('result', jsonData.objects);
                 var tableBody = $('list-objects');
+                tableBody.innerHTML = '';
                 for(var i=0; i<jsonData.objects.length; i++){
                     var dataLine = jsonData.objects[i];
                     var newTr = document.createElement('tr');
@@ -78,13 +92,21 @@
                     td3.innerHTML = dataLine.urlTo;
                     var td4 = document.createElement('td');
                     td4.innerHTML = dataLine.cacheTimeInMs;
+                    var td5 = document.createElement('td');
+                    td5.innerHTML = '<span style="cursor:pointer" onclick="deleteObj('+ dataLine.id +');"> X </span>'
+                        + '<span style="cursor:pointer" onclick="restart('+ dataLine.id +');"> 0restart0 </span>';
                     newTr.appendChild(td1);
                     newTr.appendChild(td2);
                     newTr.appendChild(td3);
                     newTr.appendChild(td4);
+                    newTr.appendChild(td5);
                     tableBody.appendChild(newTr);
                 }
             });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            refreshList();
         });
 
     </script>

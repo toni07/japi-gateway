@@ -12,6 +12,7 @@ public class Webservice implements Serializable {
 	 * attributes
 	 * **************************************************************************************
 	 */
+	private int id;
 	private String label;
 	private String urlFrom;
 	private String urlTo;
@@ -22,7 +23,8 @@ public class Webservice implements Serializable {
 	 * constructors
 	 * **************************************************************************************
 	 */
-	public Webservice(String label, String urlFrom, String urlTo, Integer cacheTimeInMs) {
+	public Webservice(int id, String label, String urlFrom, String urlTo, Integer cacheTimeInMs) {
+		this.id = id;
 		this.label = label;
 		this.urlFrom = urlFrom;
 		this.urlTo = urlTo;
@@ -40,6 +42,10 @@ public class Webservice implements Serializable {
 	 * getters & setters
 	 * **************************************************************************************
 	 */
+	public int getId() {
+		return id;
+	}
+
 	public String getLabel() {
 		return label;
 	}

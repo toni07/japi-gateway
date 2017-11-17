@@ -1,6 +1,7 @@
 package com.cyranis.japi;
 
 import com.cyranis.japi.dao.WebServiceDAO;
+import com.cyranis.japi.model.Webservice;
 import com.cyranis.japi.util.JsonTransformer;
 
 import java.util.HashMap;
@@ -10,7 +11,8 @@ import java.util.Set;
 import static spark.Spark.*;
 
 /**
- * @author aepardeau on 22/06/2017.
+ * @author toni07 on 22/06/2017
+ * http://www.restapitutorial.com/lessons/httpmethods.html
  */
 public class Launcher {
 
@@ -53,9 +55,31 @@ public class Launcher {
 					System.out.println("objectMap: " + objectMap);
 					return objectMap;
 				}, new JsonTransformer());
-				post("/",    (request, res) ->   {System.out.println("in Admin update WS method");return ""; });
-				put("/",  (request, res) ->   {System.out.println("in Admin add WS method");return ""; });
-				delete("/remove",  (request, res) ->   {System.out.println("in Admin ADD method");return ""; });
+				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				post("/",    (req, res) ->
+				{
+					res.header("Content-Type", "application/json; charset=UTF-8");
+					final String label = req.queryParams("label");
+					final String urlFrom = req.queryParams("url_from");
+					final String urlTo = req.queryParams("url_to");
+					final String cacheTimeInMsStr = req.queryParams("cache_time_in_ms");
+					final int cacheTimeInMs = (0 != cacheTimeInMsStr.length()) ? Integer.valueOf(cacheTimeInMsStr) : 0;
+					System.out.println("in Admin add WS method: " + label);
+					final Webservice webservice = new Webservice(0, label, urlFrom, urlTo, cacheTimeInMs);
+					webServiceDAO.add(webservice);
+					return "{result: true}";
+				});
+				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				put("/",  (request, res) ->   {System.out.println("in Admin update WS method");return ""; });
+				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				delete("/",  (req, res) ->   {
+					res.header("Content-Type", "application/json; charset=UTF-8");
+					final String idWsStr = req.queryParams("id_ws");
+					final int idWs = (0 != idWsStr.length()) ? Integer.valueOf(idWsStr) : 0;
+					System.out.println("in Admin delete method: " + idWs);
+					webServiceDAO.delete(idWs);
+					return "{result: true}";
+				});
 			});
 			path("/username", () -> {
 				post("/add",       (request, res) ->   {System.out.println("in Admin ADD method");return ""; });
