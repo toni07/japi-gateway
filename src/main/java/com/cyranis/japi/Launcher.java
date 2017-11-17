@@ -2,8 +2,15 @@ package com.cyranis.japi;
 
 import com.cyranis.japi.dao.WebServiceDAO;
 import com.cyranis.japi.model.Webservice;
+import com.cyranis.japi.util.Configuration;
+import com.cyranis.japi.util.FileHelper;
 import com.cyranis.japi.util.JsonTransformer;
+import com.cyranis.japi.util.ShellHelper;
 
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.http.Part;
+import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -58,19 +65,36 @@ public class Launcher {
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				post("/",    (req, res) ->
 				{
+					req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
 					res.header("Content-Type", "application/json; charset=UTF-8");
 					final String label = req.queryParams("label");
 					final String urlFrom = req.queryParams("url_from");
 					final String urlTo = req.queryParams("url_to");
 					final String cacheTimeInMsStr = req.queryParams("cache_time_in_ms");
+					final Part jarFile = req.raw().getPart("jar_file");
 					final int cacheTimeInMs = (0 != cacheTimeInMsStr.length()) ? Integer.valueOf(cacheTimeInMsStr) : 0;
+					final String jarFilePath = Configuration.PATH_WS_JAR + "/" + jarFile.getSubmittedFileName();
+					try (InputStream is = jarFile.getInputStream()) {
+						FileHelper.move(is, Paths.get(jarFilePath));
+					}
 					System.out.println("in Admin add WS method: " + label);
-					final Webservice webservice = new Webservice(0, label, urlFrom, urlTo, cacheTimeInMs);
+					final Webservice webservice = new Webservice(0, label, urlFrom, urlTo, cacheTimeInMs, jarFilePath);
 					webServiceDAO.add(webservice);
 					return "{result: true}";
 				});
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				put("/",  (request, res) ->   {System.out.println("in Admin update WS method");return ""; });
+				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				put("/restart",  (req, res) ->
+				{
+					res.header("Content-Type", "application/json; charset=UTF-8");
+					final String idWsStr = req.queryParams("id_ws");
+					final int idWs = (0 != idWsStr.length()) ? Integer.valueOf(idWsStr) : 0;
+					System.out.println("in Admin restart method: " + idWs);
+					final Webservice webservice = webServiceDAO.getById(idWs);
+					ShellHelper.executeCommand("cd /appli/webservices && nohup "+ Configuration.PATH_JAVA_EXE +" -classpath myfile.jar com.cyranis.webservice.toolbox.App 19080 &");
+					return "{result: true}";
+				});
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				delete("/",  (req, res) ->   {
 					res.header("Content-Type", "application/json; charset=UTF-8");

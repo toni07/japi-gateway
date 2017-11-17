@@ -23,6 +23,7 @@
                 <th>url from</th>
                 <th>url to</th>
                 <th>cache time (ms)</th>
+                <th>path</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -48,6 +49,16 @@
           };
           xhttp.open(method, url, true);
           xhttp.send();
+       }
+
+       function deleteObj(id)
+       {
+            if(confirm('Delete this webservice?')){
+                ajaxRequest('admin/ws/?id_ws=' + id, 'DELETE', function(jsonData){
+                    alert('ok');
+                    refreshList();
+                });
+            };
        }
 
        function deleteObj(id)
@@ -93,13 +104,16 @@
                     var td4 = document.createElement('td');
                     td4.innerHTML = dataLine.cacheTimeInMs;
                     var td5 = document.createElement('td');
-                    td5.innerHTML = '<span style="cursor:pointer" onclick="deleteObj('+ dataLine.id +');"> X </span>'
+                    td5.innerHTML = dataLine.jarFilePath;
+                    var td6 = document.createElement('td');
+                    td6.innerHTML = '<span style="cursor:pointer" onclick="deleteObj('+ dataLine.id +');"> X </span>'
                         + '<span style="cursor:pointer" onclick="restart('+ dataLine.id +');"> 0restart0 </span>';
                     newTr.appendChild(td1);
                     newTr.appendChild(td2);
                     newTr.appendChild(td3);
                     newTr.appendChild(td4);
                     newTr.appendChild(td5);
+                    newTr.appendChild(td6);
                     tableBody.appendChild(newTr);
                 }
             });

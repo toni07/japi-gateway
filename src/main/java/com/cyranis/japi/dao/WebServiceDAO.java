@@ -54,12 +54,13 @@ public class WebServiceDAO extends AbstractDAO{
 	public void add(Webservice webservice)
 	{
 		final StringBuilder sql = new StringBuilder();
-		sql.append("INSERT INTO webservices (label, url_from, url_to, cache_time_in_ms) VALUES (:label, :url_from, :url_to, :cache_time_in_ms)");
+		sql.append("INSERT INTO webservices (label, url_from, url_to, cache_time_in_ms, jar_file_path) VALUES (:label, :url_from, :url_to, :cache_time_in_ms, :jar_file_path)");
 		final Map<String, Object> parametersMap = new HashMap<>(2);
 		parametersMap.put("label", webservice.getLabel());
 		parametersMap.put("url_from", webservice.getUrlFrom());
 		parametersMap.put("url_to", webservice.getUrlTo());
 		parametersMap.put("cache_time_in_ms", webservice.getCacheTimeInMs());
+		parametersMap.put("jar_file_path", webservice.getJarFilePath());
 		executeUpdate(sql, parametersMap);
 	}
 
@@ -74,6 +75,20 @@ public class WebServiceDAO extends AbstractDAO{
 		final Map<String, Object> parametersMap = new HashMap<>(2);
 		parametersMap.put("id_ws", id);
 		executeUpdate(sql, parametersMap);
+	}
+
+	/**
+	 *
+	 * @param id
+	 * @return
+	 */
+	public Webservice getById(int id)
+	{
+		final StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * FROM webservices WHERE id_ws = :id_ws");
+		final Map<String, Object> parametersMap = new HashMap<>(2);
+		parametersMap.put("id_ws", id);
+		return buildObject(getUniqueResult(sql, parametersMap));
 	}
 
 	/**
@@ -102,7 +117,8 @@ public class WebServiceDAO extends AbstractDAO{
 		final String urlFrom = (String) dbResult.get("url_from");
 		final String urlTo = (String) dbResult.get("url_to");
 		final Integer cacheTimeInMs = ((Number) dbResult.get("cache_time_in_ms")).intValue();
-		return new Webservice(id, label, urlFrom, urlTo, cacheTimeInMs);
+		final String jarFilePath = (String) dbResult.get("jar_file_path");
+		return new Webservice(id, label, urlFrom, urlTo, cacheTimeInMs, jarFilePath);
 	}
 
 	/**

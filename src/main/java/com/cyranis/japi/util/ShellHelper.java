@@ -1,9 +1,12 @@
-package com.cyranis.japi.dao;
+package com.cyranis.japi.util;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 /**
- * @author aepardeau on 23/06/2017.
+ * @author aepardeau on 17/11/2017.
  */
-public class InitDbDAO extends AbstractDAO{
+public class ShellHelper {
 
 	/**
 	 * **************************************************************************************
@@ -22,19 +25,25 @@ public class InitDbDAO extends AbstractDAO{
 	 * methods
 	 * **************************************************************************************
 	 */
-	public static void main(String[] args) {
-		new InitDbDAO().doInit();
-	}
-
-	public void doInit()
+	public static String executeCommand(String command)
 	{
-		final StringBuilder sql = new StringBuilder("CREATE TABLE webservices (id_ws IDENTITY, label VARCHAR(255), url_from VARCHAR(255)");
-		sql.append(", url_to VARCHAR(255), cache_time_in_ms INT, jar_file_path VARCHAR(511), running_processus_id int)");
-		executeUpdate(sql, null);
+		final StringBuffer output = new StringBuffer();
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(command);
+			p.waitFor();
+			BufferedReader reader =
+					new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-		sql.setLength(0);
-		sql.append("INSERT INTO webservices (label, url_from, url_to, cache_time_in_ms) VALUES ( 'Test WebService', '/ws1', 'http://localhost:19080/test-ws', 0)");
-//		executeUpdate(sql, null);
+			String line = "";
+			while ((line = reader.readLine())!= null) {
+				output.append(line + "\n");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return output.toString();
 	}
 
 	/**

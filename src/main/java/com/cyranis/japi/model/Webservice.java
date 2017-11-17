@@ -17,18 +17,20 @@ public class Webservice implements Serializable {
 	private String urlFrom;
 	private String urlTo;
 	private Integer cacheTimeInMs;
+	private String jarFilePath;
 
 	/**
 	 * **************************************************************************************
 	 * constructors
 	 * **************************************************************************************
 	 */
-	public Webservice(int id, String label, String urlFrom, String urlTo, Integer cacheTimeInMs) {
+	public Webservice(int id, String label, String urlFrom, String urlTo, Integer cacheTimeInMs, String jarFilePath) {
 		this.id = id;
 		this.label = label;
 		this.urlFrom = urlFrom;
 		this.urlTo = urlTo;
 		this.cacheTimeInMs = cacheTimeInMs;
+		this.jarFilePath = jarFilePath;
 	}
 
 	/**
@@ -60,5 +62,9 @@ public class Webservice implements Serializable {
 
 	public Integer getCacheTimeInMs() {
 		return cacheTimeInMs;
+	}
+
+	public String getJarFilePath() {
+		return jarFilePath;
 	}
 }
