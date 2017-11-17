@@ -53,6 +53,11 @@ public class AbstractDAO {
 		}
 	}
 
+	public List<Map<String, Object>> getListResult(StringBuilder sql)
+	{
+		return getListResult(sql, null);
+	}
+
 	/**
 	 * Gets the <b>first</b> result of a SELECT query using the Sql2O library
 	 * @param sql

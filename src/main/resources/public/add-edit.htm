@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WS API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        input.small{
+            width:60px;
+        }
+    </style>
+</head>
+<body>
+
+    <h3>Edition d'une entrée</h3>
+    <form method="post" action="/edit-entry" target="_blank" onsubmit="return submitForm(this);">
+        <label>
+            Date livraison: <input type="hidden" id="date_livraison" name="date_livraison" />
+            <input type="text" id="date_livraison_day" class="small" /> / <input type="text" id="date_livraison_month" class="small" /> / <input type="text" id="date_livraison_year" class="small" />
+        </label><br /><br />
+        <label>Num semaine: <input type="date" id="num_semaine" name="num_semaine" onkeyup="plus(event);" class="small" autocomplete="off" /></label>
+        <label>Année: <input type="text" id="year" name="year" class="small" /></label><br /><br />
+        <label>Fournisseur de données:
+            <select name="id_data_provider">
+                <option value="1">Derichebourg</option>
+                <option value="2">Veolia</option>
+                <option value="3">Esd</option>
+                <option value="4">Sita</option>
+                <option value="5">Sepur</option>
+            </select>
+        </label><br /><br />
+        <label>Type fichier:
+            <select name="id_type_file">
+                <option value="1">Pesées</option>
+                <option value="2">Rattrapage mensuel</option>
+                <option value="3">Rattrapage historique</option>
+            </select>
+        </label><br /><br />
+        <input type="submit" />
+    </form>
+
+    <!--
+    <h3>Création référentiel</h3>
+    <form method="post" action="/create-empty-referential" target="_blank">
+        <input type="submit" />
+    </form>
+    -->
+    <script>
+        function plus(e)
+        {
+            if(38 == e.keyCode){        //up button
+                var elem = document.getElementById('num_semaine');
+                elem.value = 1*elem.value + 1;
+            }
+        }
+
+        function submitForm(formElem)
+        {
+            $('date_livraison').value = $('date_livraison_day').value + '/' + $('date_livraison_month').value + '/' + $('date_livraison_year').value;
+            formElem.submit();
+            return false;
+        }
+
+        function $(id)
+        {
+            return document.getElementById(id);
+        }
+    </script>
+
+</body>
+</html>

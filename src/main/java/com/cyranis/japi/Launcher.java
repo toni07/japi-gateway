@@ -1,7 +1,9 @@
 package com.cyranis.japi;
 
 import com.cyranis.japi.dao.WebServiceDAO;
+import com.cyranis.japi.util.JsonTransformer;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,15 +34,27 @@ public class Launcher {
 	public static void main(String[] args) {
 
 		port(Integer.valueOf(args[0]));
+		externalStaticFileLocation("src/main/resources/public/");
 
+		final WebServiceDAO webServiceDAO = new WebServiceDAO();
 		/**
 		 *
 		 */
 		path("/admin", () -> {
 			before("/*", (q, a) -> System.out.println("in Admin GET method"));
-			path("/email", () -> {
-				post("/add",    (request, res) ->   {System.out.println("in Admin ADD method");return ""; });
-				put("/change",  (request, res) ->   {System.out.println("in Admin ADD method");return ""; });
+			path("/ws", () -> {
+				get("/list",    (request, res) ->
+				{
+					res.header("Content-Type", "application/json; charset=UTF-8");
+					final Map<String, Object> objectMap = new HashMap<>(2);
+					objectMap.put("result", true);
+					objectMap.put("msg", "Ok!");
+					objectMap.put("objects", webServiceDAO.list());
+					System.out.println("objectMap: " + objectMap);
+					return objectMap;
+				}, new JsonTransformer());
+				post("/",    (request, res) ->   {System.out.println("in Admin update WS method");return ""; });
+				put("/",  (request, res) ->   {System.out.println("in Admin add WS method");return ""; });
 				delete("/remove",  (request, res) ->   {System.out.println("in Admin ADD method");return ""; });
 			});
 			path("/username", () -> {
@@ -58,11 +72,11 @@ public class Launcher {
 			System.out.println("in GET method");
 			final String uri = request.uri();// the uri, e.g. "/foo/toto"
 			final String[] urlSplit = uri.split("/");
+			System.out.println("URL urlSplit[1]: " + urlSplit[1]);
 			if("admin".equals(urlSplit[1])){
 				System.out.println("Admin URL, skipping...");
 			}
 			else{
-				final WebServiceDAO webServiceDAO = new WebServiceDAO();
 				final Map<String, Object> webService = webServiceDAO.getByUri(uri);
 				if(null != webService){
 					System.out.println("found corresponding WS!");
@@ -78,6 +92,12 @@ public class Launcher {
 			}
 
 			return "API Management";
+		});
+
+		exception(Exception.class, (exception, request, response) ->
+		{
+			System.err.println("error occured");
+			exception.printStackTrace();
 		});
 
 	}

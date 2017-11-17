@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WS API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        input.small{
+            width:60px;
+        }
+    </style>
+</head>
+<body>
+
+    <h3>Liste des WS</h3>
+    <a target="_blank" href="add-edit.htm">+ Add</a>
+    &nbsp;&nbsp;<a target="_blank" href="/admin/ws/list?export=1">Export</a>
+    <table style="width:100%;" border="1">
+        <thead>
+            <tr>
+                <th>label</th>
+                <th>url from</th>
+                <th>url to</th>
+                <th>cache time (ms)</th>
+            </tr>
+        </thead>
+        <tbody id="list-objects">
+
+        </tbody>
+    </table>
+
+    <!--
+    <h3>Création référentiel</h3>
+    <form method="post" action="/create-empty-referential" target="_blank">
+        <input type="submit" />
+    </form>
+    -->
+    <script>
+       function ajaxRequest(url, callback)
+       {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                callback(this.responseText);
+            }
+          };
+          xhttp.open("GET", url, true);
+          xhttp.send();
+       }
+
+       function dateUSToFR(theDate)
+       {
+            if(null == theDate){
+                return null;
+            }
+            theDate = theDate.split('-');
+            return theDate[2] + '/' + theDate[1] + '/' + theDate[0];
+       }
+
+       function $(id)
+        {
+            return document.getElementById(id);
+        }
+
+       document.addEventListener("DOMContentLoaded", function() {
+          ajaxRequest('/admin/ws/list', function(jsonData){
+                jsonData = JSON.parse(jsonData);
+                console.log('result', jsonData.objects);
+                var tableBody = $('list-objects');
+                for(var i=0; i<jsonData.objects.length; i++){
+                    var dataLine = jsonData.objects[i];
+                    var newTr = document.createElement('tr');
+                    var td1 = document.createElement('td');
+                    td1.innerHTML = dataLine.label;
+                    var td2 = document.createElement('td');
+                    td2.innerHTML = dataLine.urlFrom;
+                    var td3 = document.createElement('td');
+                    td3.innerHTML = dataLine.urlTo;
+                    var td4 = document.createElement('td');
+                    td4.innerHTML = dataLine.cacheTimeInMs;
+                    newTr.appendChild(td1);
+                    newTr.appendChild(td2);
+                    newTr.appendChild(td3);
+                    newTr.appendChild(td4);
+                    tableBody.appendChild(newTr);
+                }
+            });
+        });
+
+    </script>
+
+</body>
+</html>
