@@ -1,0 +1,6 @@
+{
+  "apis": [
+      {"label": "Test WebService", "url_from": "/ws1", "url_to": "http://localhost:19080/test-ws", "cache_time_in_ms": 0}
+    , {"label": "Test WebService 2", "url_from": "/ws2", "url_to": "http://localhost:19080/test-ws2", "cache_time_in_ms": 5000}
+  ]
+}

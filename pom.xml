@@ -41,6 +41,18 @@
             <artifactId>gson</artifactId>
             <version>2.7</version>
         </dependency>
+        <!-- http://unirest.io/java.html -->
+        <dependency>
+            <groupId>com.mashape.unirest</groupId>
+            <artifactId>unirest-java</artifactId>
+            <version>1.4.9</version>
+        </dependency>
+        <!-- cache system: https://github.com/ben-manes/caffeine -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>2.6.2</version>
+        </dependency>
     </dependencies>
 
 </project>

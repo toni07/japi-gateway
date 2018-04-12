@@ -96,13 +96,13 @@ public class WebServiceDAO extends AbstractDAO{
 	 * @param uri
 	 * @return
 	 */
-	public Map<String, Object> getByUri(String uri)
+	public Webservice getByUri(String uri)
 	{
 		final StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM webservices WHERE url_from = :url_from");
 		final Map<String, Object> parametersMap = new HashMap<>(2);
 		parametersMap.put("url_from", uri);
-		return getUniqueResult(sql, parametersMap);
+		return buildObject(getUniqueResult(sql, parametersMap));
 	}
 
 	/**

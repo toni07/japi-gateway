@@ -6,6 +6,12 @@ import com.cyranis.japi.util.Configuration;
 import com.cyranis.japi.util.FileHelper;
 import com.cyranis.japi.util.JsonTransformer;
 import com.cyranis.japi.util.ShellHelper;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import spark.Request;
+import spark.Response;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
@@ -115,32 +121,11 @@ public class Launcher {
 		/**
 		 *
 		 */
-		get("*", (request, res) ->
-		{
-			System.out.println("in GET method");
-			final String uri = request.uri();// the uri, e.g. "/foo/toto"
-			final String[] urlSplit = uri.split("/");
-			System.out.println("URL urlSplit[1]: " + urlSplit[1]);
-			if("admin".equals(urlSplit[1])){
-				System.out.println("Admin URL, skipping...");
-			}
-			else{
-				final Map<String, Object> webService = webServiceDAO.getByUri(uri);
-				if(null != webService){
-					System.out.println("found corresponding WS!");
-					final String requestMethod = request.requestMethod();// The HTTP method (GET, ..etc)
-					final Map<String, String> cookies = request.cookies();// request cookies sent by the client
-					final Set<String> headers = request.headers();// the HTTP header list
-					final String header1 = request.headers("User-Agent");// value of BAR header
-					final Map<String, String> params = request.params();// map with all parameters
-				}
-				else{
-					System.err.println("no corresponding WS found for `url_from` " + uri);
-				}
-			}
-
-			return "API Management";
-		});
+		get("*", (request, response) -> getReturnBody(request, response, webServiceDAO));
+		post("*", (request, response) -> getReturnBody(request, response, webServiceDAO));
+		put("*", (request, response) -> getReturnBody(request, response, webServiceDAO));
+		delete("*", (request, response) -> getReturnBody(request, response, webServiceDAO));
+		options("*", (request, response) -> getReturnBody(request, response, webServiceDAO));
 
 		exception(Exception.class, (exception, request, response) ->
 		{
@@ -148,6 +133,48 @@ public class Launcher {
 			exception.printStackTrace();
 		});
 
+	}
+
+	private static String getReturnBody(Request request, Response response, WebServiceDAO webServiceDAO)
+	{
+		System.out.println("in GET/POST/PUT/DELETE/OPTIONS method");
+		final String uri = request.uri();// the uri, e.g. "/foo/toto"
+		final String[] urlSplit = uri.split("/");
+		System.out.println("URL urlSplit[1]: " + urlSplit[1]);
+		if("admin".equals(urlSplit[1])){
+			System.out.println("Admin URL, skipping...");
+		}
+		else{
+			final Webservice webService = webServiceDAO.getByUri(uri);
+			if(null != webService){
+				System.out.println("found corresponding WS!");
+				final String requestMethod = request.requestMethod();// The HTTP method (GET, ..etc)
+				final Map<String, String> cookies = request.cookies();// request cookies sent by the client
+				final Set<String> headers = request.headers();// the HTTP header list
+				final String header1 = request.headers("User-Agent");// value of BAR header
+				final Map<String, String> params = request.params();// map with all parameters
+
+				//make the HTTP call
+				final String urlTargetWebService = "http://webservices.datapole.local/calendar/getDateData";
+				//					urlTargetWebService = webService.getUrlTo();
+				final HttpResponse<JsonNode> jsonResponse;
+				try {
+					jsonResponse = Unirest.get(urlTargetWebService)
+							.header("accept", "application/json")
+							.queryString("date", "2015-01-01")
+							.queryString("idTerritory", "1")
+							.asJson();
+					return jsonResponse.getBody().toString();
+				}
+				catch (UnirestException e) {
+					e.printStackTrace();
+				}
+			}
+			else{
+				System.err.println("no corresponding WS found for `url_from` " + uri);
+			}
+		}
+		return "Nothing found here";
 	}
 
 	/**
