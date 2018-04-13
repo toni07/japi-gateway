@@ -1,11 +1,10 @@
 package com.cyranis.japi.dao;
 
 import com.cyranis.japi.model.Webservice;
+import com.cyranis.japi.util.JSONHelper;
+import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author aepardeau on 23/06/2017.
@@ -98,12 +97,25 @@ public class WebServiceDAO extends AbstractDAO{
 	 */
 	public Webservice getByUri(String uri)
 	{
-		final StringBuilder sql = new StringBuilder();
-		sql.append("SELECT * FROM webservices WHERE url_from = :url_from");
-		final Map<String, Object> parametersMap = new HashMap<>(2);
-		parametersMap.put("url_from", uri);
-		return buildObject(getUniqueResult(sql, parametersMap));
-	}
+//		final StringBuilder sql = new StringBuilder();
+//		sql.append("SELECT * FROM webservices WHERE url_from = :url_from");
+//		final Map<String, Object> parametersMap = new HashMap<>(2);
+//		parametersMap.put("url_from", uri);
+//		return buildObject(getUniqueResult(sql, parametersMap));
+        final JsonNode jsonNode = JSONHelper.fileToJsonNode("configuration.json");
+        final JsonNode apis = jsonNode.get("apis");
+        final Iterator<JsonNode> iterator = apis.iterator();
+        while (iterator.hasNext()){
+            final JsonNode api = iterator.next();
+            final String url = api.get("url_from").asText();
+            final String urlTo = api.get("url_to").asText();
+            final int cacheTimeInMs = api.get("cache_time_in_ms").asInt();
+            if(uri.equals(url)){
+                return new Webservice(0, "", url, urlTo, cacheTimeInMs, "");
+            }
+        }
+        return null;
+    }
 
 	/**
 	 *
