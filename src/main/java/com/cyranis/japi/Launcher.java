@@ -119,11 +119,11 @@ public class Launcher {
 		/**
 		 *
 		 */
-		get("*", (request, response) -> getReturnBody(request, response, webServiceDAO));
-		post("*", (request, response) -> getReturnBody(request, response, webServiceDAO));
-		put("*", (request, response) -> getReturnBody(request, response, webServiceDAO));
-		delete("*", (request, response) -> getReturnBody(request, response, webServiceDAO));
-		options("*", (request, response) -> getReturnBody(request, response, webServiceDAO));
+		get("*", (request, response) -> getReturnBody(request, response, webServiceDAO, HttpHelper.GET));
+		post("*", (request, response) -> getReturnBody(request, response, webServiceDAO, HttpHelper.POST));
+		put("*", (request, response) -> getReturnBody(request, response, webServiceDAO, HttpHelper.PUT));
+		delete("*", (request, response) -> getReturnBody(request, response, webServiceDAO, HttpHelper.DELETE));
+		options("*", (request, response) -> getReturnBody(request, response, webServiceDAO, HttpHelper.OPTIONS));
 
 		exception(Exception.class, (exception, request, response) ->
 		{
@@ -133,7 +133,15 @@ public class Launcher {
 
 	}
 
-	private static String getReturnBody(Request request, Response response, WebServiceDAO webServiceDAO)
+    /**
+     * Parses the http query, calls the distant WS, and returns the response
+     * @param request
+     * @param response
+     * @param webServiceDAO
+     * @param httpMethod
+     * @return
+     */
+	private static String getReturnBody(Request request, Response response, WebServiceDAO webServiceDAO, String httpMethod)
 	{
 		System.out.println("in GET/POST/PUT/DELETE/OPTIONS method");
         response.header("Content-Type", "application/json; charset=UTF-8");
@@ -147,31 +155,36 @@ public class Launcher {
 			final Webservice webService = webServiceDAO.getByUri(uri);
 			if(null != webService){
 				System.out.println("found corresponding WS!");
-				final String requestMethod = request.requestMethod();// The HTTP method (GET, ..etc)
-				final Map<String, String> cookies = request.cookies();// request cookies sent by the client
-				final Set<String> headers = request.headers();// the HTTP header list
-				final String header1 = request.headers("User-Agent");// value of BAR header
-                final Set<String> queryParams = request.queryParams();
-                final Map<String, Object> queryParamsMap = new HashMap<>(queryParams.size());
-                for (String key : queryParams) {
-                    queryParamsMap.put(key, request.queryParams(key));
-                }
-                System.out.println("query params are: " + queryParamsMap);
+				if(HttpHelper.GET.equals(httpMethod)){
+                    final String requestMethod = request.requestMethod();// The HTTP method (GET, ..etc)
+                    final Map<String, String> cookies = request.cookies();// request cookies sent by the client
+                    final Set<String> headers = request.headers();// the HTTP header list
+                    final String header1 = request.headers("User-Agent");// value of BAR header
+                    final Set<String> queryParams = request.queryParams();
+                    final Map<String, Object> queryParamsMap = new HashMap<>(queryParams.size());
+                    for (String key : queryParams) {
+                        queryParamsMap.put(key, request.queryParams(key));
+                    }
+                    System.out.println("query params are: " + queryParamsMap);
 
-				//make the HTTP call
-				final String urlTargetWebService = webService.getUrlTo();
-				final HttpResponse<JsonNode> jsonResponse;
-				try {
-                    Unirest.setHttpClient(HttpHelper.getHttpClient());
-					jsonResponse = Unirest.get(urlTargetWebService)
+                    //make the HTTP call
+                    final String urlTargetWebService = webService.getUrlTo();
+                    final HttpResponse<JsonNode> jsonResponse;
+                    try {
+                        Unirest.setHttpClient(HttpHelper.getHttpClient());
+                        jsonResponse = Unirest.get(urlTargetWebService)
 //							.header("accept", "application/json")
-                            .queryString(queryParamsMap)
-							.asJson();
-					return jsonResponse.getBody().toString();
-				}
-				catch (UnirestException e) {
-					e.printStackTrace();
-				}
+                                .queryString(queryParamsMap)
+                                .asJson();
+                        return jsonResponse.getBody().toString();
+                    }
+                    catch (UnirestException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(HttpHelper.POST.equals(httpMethod)){
+				    
+                }
 			}
 			else{
 				System.err.println("no corresponding WS found for `url_from` " + uri);

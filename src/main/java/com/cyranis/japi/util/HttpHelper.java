@@ -15,8 +15,27 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+/**
+ * @author toni07 14/04/2018
+ */
 public class HttpHelper {
 
+    /**
+     * **************************************************************************************
+     * attributes
+     * **************************************************************************************
+     */
+    public final static String GET = "get";
+    public final static String POST = "post";
+    public final static String PUT = "put";
+    public final static String DELETE = "delete";
+    public final static String OPTIONS = "options";
+
+    /**
+     * **************************************************************************************
+     * methods
+     * **************************************************************************************
+     */
     /**
      * Used not to check the certificate for https queries (bad but...)
      * Thanks to https://github.com/Kong/unirest-java/issues/70 and https://laurenthinoul.com/how-to-fix-unirest-general-sslengine-problem/
