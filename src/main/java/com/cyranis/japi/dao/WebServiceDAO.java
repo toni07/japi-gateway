@@ -102,16 +102,17 @@ public class WebServiceDAO extends AbstractDAO{
 //		final Map<String, Object> parametersMap = new HashMap<>(2);
 //		parametersMap.put("url_from", uri);
 //		return buildObject(getUniqueResult(sql, parametersMap));
-        final JsonNode jsonNode = JSONHelper.fileToJsonNode("configuration.json");
-        final JsonNode apis = jsonNode.get("apis");
-        final Iterator<JsonNode> iterator = apis.iterator();
-        while (iterator.hasNext()){
-            final JsonNode api = iterator.next();
-            final String url = api.get("url_from").asText();
-            final String urlTo = api.get("url_to").asText();
-            final int cacheTimeInMs = api.get("cache_time_in_ms").asInt();
-            if(uri.equals(url)){
-                return new Webservice(0, "", url, urlTo, cacheTimeInMs, "");
+        final JsonNode rootNode = JSONHelper.fileToJsonNode("configuration.json");
+        final JsonNode apisNode = rootNode.get("apis");
+        final Iterator<JsonNode> apiIterator = apisNode.iterator();
+        while (apiIterator.hasNext()){
+            final JsonNode apiNode = apiIterator.next();
+            final String label = apiNode.get("label").asText();
+            final String urlFrom = apiNode.get("url_from").asText();
+            final String urlTo = apiNode.get("url_to").asText();
+            final int cacheTimeInMs = apiNode.get("cache_time_in_ms").asInt();
+            if(uri.equals(urlFrom)){
+                return new Webservice(0, label, urlFrom, urlTo, cacheTimeInMs, "");
             }
         }
         return null;

@@ -2,14 +2,12 @@ package com.cyranis.japi;
 
 import com.cyranis.japi.dao.WebServiceDAO;
 import com.cyranis.japi.model.Webservice;
-import com.cyranis.japi.util.Configuration;
-import com.cyranis.japi.util.FileHelper;
-import com.cyranis.japi.util.JsonTransformer;
-import com.cyranis.japi.util.ShellHelper;
+import com.cyranis.japi.util.*;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
 
@@ -138,6 +136,7 @@ public class Launcher {
 	private static String getReturnBody(Request request, Response response, WebServiceDAO webServiceDAO)
 	{
 		System.out.println("in GET/POST/PUT/DELETE/OPTIONS method");
+        response.header("Content-Type", "application/json; charset=UTF-8");
 		final String uri = request.uri();// the uri, e.g. "/foo/toto"
 		final String[] urlSplit = uri.split("/");
 		System.out.println("URL urlSplit[1]: " + urlSplit[1]);
@@ -152,17 +151,21 @@ public class Launcher {
 				final Map<String, String> cookies = request.cookies();// request cookies sent by the client
 				final Set<String> headers = request.headers();// the HTTP header list
 				final String header1 = request.headers("User-Agent");// value of BAR header
-				final Map<String, String> params = request.params();// map with all parameters
+                final Set<String> queryParams = request.queryParams();
+                final Map<String, Object> queryParamsMap = new HashMap<>(queryParams.size());
+                for (String key : queryParams) {
+                    queryParamsMap.put(key, request.queryParams(key));
+                }
+                System.out.println("query params are: " + queryParamsMap);
 
 				//make the HTTP call
-				final String urlTargetWebService = "http://webservices.datapole.local/calendar/getDateData";
-				//					urlTargetWebService = webService.getUrlTo();
+				final String urlTargetWebService = webService.getUrlTo();
 				final HttpResponse<JsonNode> jsonResponse;
 				try {
+                    Unirest.setHttpClient(HttpHelper.getHttpClient());
 					jsonResponse = Unirest.get(urlTargetWebService)
-							.header("accept", "application/json")
-							.queryString("date", "2015-01-01")
-							.queryString("idTerritory", "1")
+//							.header("accept", "application/json")
+                            .queryString(queryParamsMap)
 							.asJson();
 					return jsonResponse.getBody().toString();
 				}
